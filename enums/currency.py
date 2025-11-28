@@ -7,3 +7,4 @@ class Currency(Enum):
     JPY = "JPY"
     CAD = "CAD"
     GBP = "GBP"
+    UZS = "UZS"

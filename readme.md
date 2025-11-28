@@ -1,7 +1,7 @@
-<h1 align="center">AiogramShopBot</h1>
+<h1 align="center">SoniferQuqonBot</h1>
 
 <p align="center">
-  <a href="https://t.me/demo_aiogramshopbot">
+  <a href="https://t.me/demo_soniferquqonbot">
     <img src="https://img.shields.io/badge/Live_Demo_Bot-blue?logo=probot&logoColor=white" alt="Live bot"/>
   </a>
   <a href="https://t.me/ilyarolf_dev">
@@ -19,25 +19,25 @@
 [![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?logo=ethereum&logoColor=white)](https://github.com/ethereum)
 [![BinanceCoin](https://img.shields.io/badge/Binance-FCD535?logo=binance&logoColor=000)](https://github.com/binance)
 
-**AiogramShopBot is a software product based on Aiogram3 and SQLAlchemy that allows you to automate sales of digital
-goods in Telegram. One of the bot's advantages is that AiogramShopBot implements the ability to top up with Bitcoin,
+**SoniferQuqonBot is a software product based on Aiogram3 and SQLAlchemy that allows you to automate sales of digital
+goods in Telegram. One of the bot's advantages is that SoniferQuqonBot implements the ability to top up with Bitcoin,
 Litecoin, Solana, Ethereum and Binance-Coin, which allows you to sell digital goods worldwide.**
 
 * [🤝 Commercial offers](#commercial-offers)
     + [➤ Telegram. ](#-for-commercial-offers-contact-me-on-telegram)
-    + [🤖 AiogramShopBotDemo](#-you-can-test-the-functionality-in-aiogramshopbotdemo).
+    + [🤖 SoniferQuqonBotDemo](#-you-can-test-the-functionality-in-soniferquqonbotdemo).
 * [✨ Donate](#donate-)
 * [1.Launch the bot](#1starting-the-bot)
     + [1.0 Description of required environment variables. ](#10-description-of-required-environment-variables)
-    + [1.1 Launch AiogramShopBot with Docker-compose.](#11-starting-aiogramshopbot-with-docker-compose)
-    + [1.2 Launch AiogramShopBot without SQLCipher database encryption.](#12-starting-aiogramshopbot-without-database-encryption)
-    + [1.3 Launch AiogramShopBot with SQLCipher database encryption.](#13-starting-aiogramshopbot-with-sqlcipher-database-encryption)
-* [2. 👥 AiogramShopBot User's Manual](#2aiogramshopbot-users-manual)
+    + [1.1 Launch SoniferQuqonBot with Docker-compose.](#11-starting-soniferquqonbot-with-docker-compose)
+    + [1.2 Launch SoniferQuqonBot without SQLCipher database encryption.](#12-starting-soniferquqonbot-without-database-encryption)
+    + [1.3 Launch SoniferQuqonBot with SQLCipher database encryption.](#13-starting-soniferquqonbot-with-sqlcipher-database-encryption)
+* [2. 👥 SoniferQuqonBot User's Manual](#2soniferquqonbot-users-manual)
     + [2.1 🖥️ Registration](#21-registration)
     + [2.2 ➕ Top Up Balance](#22--top-up-balance)
     + [2.3 👜 Purchase of goods](#23-purchase-of-goods)
     + [2.4 🧾 Purchase History](#24--purchase-history)
-* [3. 🔑 AiogramShopBot Admin Manual](#3aiogramshopbot-admin-manual)
+* [3. 🔑 SoniferQuqonBot Admin Manual](#3soniferquqonbot-admin-manual)
     + [3.1 🔑 Adding a new admin](#31-adding-a-new-admin)
     + [3.2 📢 Announcements](#32--announcements)
         - [3.2.1 📢 Send to Everyone](#321--send-to-everyone)
@@ -69,7 +69,7 @@ Litecoin, Solana, Ethereum and Binance-Coin, which allows you to sell digital go
 
 ### ➤ For commercial offers contact me on [Telegram](https://t.me/ilyarolf_dev).
 
-### 🤖 You can test the functionality in [AiogramShopBotDemo](https://t.me/demo_aiogramshopbot).
+### 🤖 You can test the functionality in [SoniferQuqonBotDemo](https://t.me/demo_soniferquqonbot).
 
 ## Donate ✨
 
@@ -111,9 +111,9 @@ Litecoin, Solana, Ethereum and Binance-Coin, which allows you to sell digital go
 | REDIS_PASSWORD            | Required variable, needed to make the throttling mechanism work.                                                                                                                                                                                                                                                            | Any string you want                                                 |   
 | REDIS_HOST                | Required variable, needed to make the throttling mechanism work.                                                                                                                                                                                                                                                            | "redis" for docker-compose.yml                                      |   
 
-### 1.1 Starting AiogramShopBot with Docker-compose.
+### 1.1 Starting SoniferQuqonBot with Docker-compose.
 
-* Clone the project.<br>``git clone https://github.com/ilyarolf/AiogramShopBot.git``
+* Clone the project.<br>``git clone https://github.com/ilyarolf/SoniferQuqonBot.git``
 * Set environment variables in .env file.
 * Set your domain in the docker-compose.yml file to the bot service in the labels caddy section. {YOUR_IP_ADDRESS}.sslip.io
 * Run the ``docker-compose up`` command.
@@ -134,9 +134,9 @@ pull a TLS certificate
 and serves as reverse proxy for your bot. You can also run your bot together with an already existing reverse proxy. In
 this case you have to remove the caddy service from the docker-compose file and configure the reverse proxy accordingly.
 
-### 1.2 Starting AiogramShopBot without database encryption.
+### 1.2 Starting SoniferQuqonBot without database encryption.
 
-* Clone the project from the master branch. <br>``git clone https://github.com/ilyarolf/AiogramShopBot.git``
+* Clone the project from the master branch. <br>``git clone https://github.com/ilyarolf/SoniferQuqonBot.git``
 * Install all necessary packages <br>``pip install -r requirements.txt``
 * Set the environment variables to run in the .env file.<br>Example:
 
@@ -166,13 +166,13 @@ REDIS_HOST = "localhost"
 
 * After these steps the bot is ready to run, launch the bot with command ```python run.py```
 
-### 1.3 Starting AiogramShopBot with SQLCipher database encryption.
+### 1.3 Starting SoniferQuqonBot with SQLCipher database encryption.
 
 > **Note**
-> **<br>To run AiogramShopBot with database encryption via SQLCipher, you need to use Linux kernel operating systems.**
+> **<br>To run SoniferQuqonBot with database encryption via SQLCipher, you need to use Linux kernel operating systems.**
 
 * Clone the project.
-  branch.<br>``git clone https://github.com/ilyarolf/AiogramShopBot.git``
+  branch.<br>``git clone https://github.com/ilyarolf/SoniferQuqonBot.git``
 * Install the SQLCipher package, for example in Ubuntu this can be done with the
   command <br>``sudo apt install sqlcipher``.
 * Install all necessary packages <br>``pip install -r requirements.txt``
@@ -205,7 +205,7 @@ REDIS_HOST = "localhost"
 
 * After these steps the bot is ready to run, the entry point to run the bot is run.py <br>```python run.py```
 
-## 2.AiogramShopBot User's Manual
+## 2.SoniferQuqonBot User's Manual
 
 ### 2.1 Registration
 
@@ -236,7 +236,7 @@ purchase. If the purchase is successful, you will immediately receive a message 
 
 ![imb](https://i.imgur.com/t5sA38N.gif)
 
-## 3.AiogramShopBot Admin Manual
+## 3.SoniferQuqonBot Admin Manual
 
 ### 3.1 Adding a new admin
 

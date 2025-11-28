@@ -105,7 +105,9 @@
     "cad_symbol": "C$",
     "cad_text": "CAD",
     "gbp_symbol": "£",
-    "gbp_text": "GBP"
+    "gbp_text": "GBP",
+    "uzs_symbol": "🇺🇿",
+    "uzs_text": "UZS"
   },
   "user": {
     "all_categories": "🗂️ All categories",
