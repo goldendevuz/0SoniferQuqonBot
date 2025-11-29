@@ -60,21 +60,6 @@ class UserService:
     async def get_top_up_buttons(callback: CallbackQuery) -> tuple[str, InlineKeyboardBuilder]:
         unpacked_cb = MyProfileCallback.unpack(callback.data)
         kb_builder = InlineKeyboardBuilder()
-        kb_builder.button(text=Localizator.get_text(BotEntity.COMMON, "btc_top_up"),
-                          callback_data=MyProfileCallback.create(unpacked_cb.level + 1,
-                                                                 args_for_action=Cryptocurrency.BTC.value))
-        kb_builder.button(text=Localizator.get_text(BotEntity.COMMON, "ltc_top_up"),
-                          callback_data=MyProfileCallback.create(unpacked_cb.level + 1,
-                                                                 args_for_action=Cryptocurrency.LTC.value))
-        kb_builder.button(text=Localizator.get_text(BotEntity.COMMON, "sol_top_up"),
-                          callback_data=MyProfileCallback.create(unpacked_cb.level + 1,
-                                                                 args_for_action=Cryptocurrency.SOL.value))
-        kb_builder.button(text=Localizator.get_text(BotEntity.COMMON, "eth_top_up"),
-                          callback_data=MyProfileCallback.create(unpacked_cb.level + 1,
-                                                                 args_for_action=Cryptocurrency.ETH.value))
-        kb_builder.button(text=Localizator.get_text(BotEntity.COMMON, "bnb_top_up"),
-                          callback_data=MyProfileCallback.create(unpacked_cb.level + 1,
-                                                                 args_for_action=Cryptocurrency.BNB.value))
 
         kb_builder.adjust(1)
         kb_builder.row(unpacked_cb.get_back_button())

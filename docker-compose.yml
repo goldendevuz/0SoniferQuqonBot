@@ -10,12 +10,8 @@ services:
     ports:
       - "4040:4040"
       - "5000:5000"
-    expose:
-      - 4040
-      - 5000
     volumes:
-      - ./SoniferQuqonBot:/bot/data
-    command: ["python", "-u", "run.py"]
+      - ./SoniferQuqonBot:/bot/data  # Only persist database folder
     restart: always
     depends_on:
       - redis

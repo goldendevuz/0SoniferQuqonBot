@@ -391,40 +391,28 @@ class AdminService:
                     total_profit=total_profit, items_sold=items_sold,
                     buys_count=len(buys), currency_sym=Localizator.get_currency_symbol()), kb_builder
             case StatisticsEntity.DEPOSITS:
-                deposits = await DepositRepository.get_by_timedelta(unpacked_cb.timedelta, session)
-                fiat_amount = 0.0
-                btc_amount = 0.0
-                ltc_amount = 0.0
-                sol_amount = 0.0
-                eth_amount = 0.0
-                bnb_amount = 0.0
-                for deposit in deposits:
-                    match deposit.network:
-                        case "BTC":
-                            btc_amount += deposit.amount / pow(10, deposit.network.get_divider())
-                        case "LTC":
-                            ltc_amount += deposit.amount / pow(10, deposit.network.get_divider())
-                        case "SOL":
-                            sol_amount += deposit.amount / pow(10, deposit.network.get_divider())
-                        case "ETH":
-                            eth_amount += deposit.amount / pow(10, deposit.network.get_divider())
-                        case "BNB":
-                            bnb_amount += deposit.amount / pow(10, deposit.network.get_divider())
-                prices = await CryptoApiWrapper.get_crypto_prices()
-                btc_price = prices[Cryptocurrency.BTC.get_coingecko_name()][config.CURRENCY.value.lower()]
-                ltc_price = prices[Cryptocurrency.LTC.get_coingecko_name()][config.CURRENCY.value.lower()]
-                sol_price = prices[Cryptocurrency.SOL.get_coingecko_name()][config.CURRENCY.value.lower()]
-                eth_price = prices[Cryptocurrency.ETH.get_coingecko_name()][config.CURRENCY.value.lower()]
-                bnb_price = prices[Cryptocurrency.BNB.get_coingecko_name()][config.CURRENCY.value.lower()]
-                fiat_amount += ((btc_amount * btc_price) + (ltc_amount * ltc_price) + (sol_amount * sol_price)
-                                + (eth_amount * eth_price) + (bnb_amount * bnb_price))
-                kb_builder.row(AdminConstants.back_to_main_button, unpacked_cb.get_back_button())
-                return Localizator.get_text(BotEntity.ADMIN, "deposits_statistics_msg").format(
-                    timedelta=unpacked_cb.timedelta, deposits_count=len(deposits),
-                    btc_amount=btc_amount, ltc_amount=ltc_amount,
-                    sol_amount=sol_amount, eth_amount=eth_amount,
-                    bnb_amount=bnb_amount,
-                    fiat_amount=fiat_amount, currency_text=Localizator.get_currency_text()), kb_builder
+                # get deposits for selected period
+                deposits = await DepositRepository.get_by_timedelta(
+                    unpacked_cb.timedelta,
+                    session
+                )
+
+                # buttons
+                kb_builder.row(
+                    AdminConstants.back_to_main_button,
+                    unpacked_cb.get_back_button()
+                )
+
+                return (
+                    Localizator.get_text(
+                        BotEntity.ADMIN,
+                        "deposits_statistics_msg"
+                    ).format(
+                        timedelta=unpacked_cb.timedelta,
+                        deposits_count=len(deposits)
+                    ),
+                    kb_builder
+                )
 
     @staticmethod
     async def get_wallet_menu() -> tuple[str, InlineKeyboardBuilder]:
@@ -437,13 +425,11 @@ class AdminService:
     @staticmethod
     async def get_withdraw_menu() -> tuple[str, InlineKeyboardBuilder]:
         kb_builder = InlineKeyboardBuilder()
-        wallet_balance = await CryptoApiWrapper.get_wallet_balance()
-        [kb_builder.button(
-            text=Localizator.get_text(BotEntity.COMMON, f"{key.lower()}_top_up"),
-            callback_data=WalletCallback.create(1, Cryptocurrency(key))
-        ) for key in wallet_balance.keys()]
         kb_builder.adjust(1)
         kb_builder.row(AdminConstants.back_to_main_button)
+
+        wallet_balance = await CryptoApiWrapper.get_wallet_balance()
+
         msg_text = Localizator.get_text(BotEntity.ADMIN, "crypto_wallet").format(
             btc_balance=wallet_balance.get('BTC') or 0.0,
             ltc_balance=wallet_balance.get('LTC') or 0.0,
@@ -451,8 +437,10 @@ class AdminService:
             eth_balance=wallet_balance.get('ETH') or 0.0,
             bnb_balance=wallet_balance.get('BNB') or 0.0
         )
-        if sum(wallet_balance.values()) > 0:
-            msg_text += Localizator.get_text(BotEntity.ADMIN, "choose_crypto_to_withdraw")
+
+        # If you want: still show “choose crypto”, or remove this too
+        # msg_text += Localizator.get_text(...)
+
         return msg_text, kb_builder
 
     @staticmethod

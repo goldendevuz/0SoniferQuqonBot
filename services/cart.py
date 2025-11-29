@@ -1,3 +1,4 @@
+import logging
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -47,7 +48,14 @@ class CartService:
         kb_builder = InlineKeyboardBuilder()
         for cart_item in cart_items:
             item_dto = ItemDTO(category_id=cart_item.category_id, subcategory_id=cart_item.subcategory_id)
+            logging.info(f"Preparing to fetch price for item {item_dto}")
+            logging.info(f"Fetching price for item {item_dto.subcategory_id}")
             price = await ItemRepository.get_price(item_dto, session)
+            logging.info(f"Price fetched for item {item_dto.subcategory_id}: {price}")
+            if price is None:
+                logging.warning(f"Cart item {cart_item.id} has missing product/price")
+                continue  # skip this item
+  
             subcategory = await SubcategoryRepository.get_by_id(cart_item.subcategory_id, session)
             kb_builder.button(text=Localizator.get_text(BotEntity.USER, "cart_item_button").format(
                 subcategory_name=subcategory.name,
