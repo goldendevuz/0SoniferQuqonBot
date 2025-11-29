@@ -103,6 +103,10 @@ class CartService:
             item_dto = ItemDTO(category_id=cart_item.category_id, subcategory_id=cart_item.subcategory_id)
             price = await ItemRepository.get_price(item_dto, session)
             subcategory = await SubcategoryRepository.get_by_id(cart_item.subcategory_id, session)
+            if price is None:
+                logging.warning(f"Cart item {cart_item.id} has missing product/price")
+                continue  # skip this item
+
             line_item_total = price * cart_item.quantity
             cart_line_item = Localizator.get_text(BotEntity.USER, "cart_item_button").format(
                 subcategory_name=subcategory.name, qty=cart_item.quantity,
@@ -138,6 +142,10 @@ class CartService:
         for cart_item in cart_items:
             item_dto = ItemDTO(category_id=cart_item.category_id, subcategory_id=cart_item.subcategory_id)
             price = await ItemRepository.get_price(item_dto, session)
+            if price is None:
+                logging.warning(f"Cart item {cart_item.id} has missing product/price")
+                continue  # skip this item
+
             cart_total += price * cart_item.quantity
             is_in_stock = await ItemRepository.get_available_qty(item_dto, session) >= cart_item.quantity
             if is_in_stock is False:
