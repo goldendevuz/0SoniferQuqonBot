@@ -242,29 +242,54 @@ class AdminService:
                     currency_text=Localizator.get_currency_text()), kb_builder
 
     @staticmethod
-    async def balance_management(message: Message, state: FSMContext, session: AsyncSession | Session) -> str:
+    async def balance_management(message: Message, state: FSMContext, session: AsyncSession | Session) -> tuple[str, str, int]:
         data = await state.get_data()
         await state.clear()
+
         user = await UserRepository.get_user_entity(data['user_entity'], session)
         operation = UserManagementOperation(int(data['operation']))
+
         if user is None:
-            return Localizator.get_text(BotEntity.ADMIN, "credit_management_user_not_found")
-        elif operation == UserManagementOperation.ADD_BALANCE:
-            user.top_up_amount += float(message.text)
+            return (
+                Localizator.get_text(BotEntity.ADMIN, "credit_management_user_not_found"),
+                None,
+                None
+            )
+
+        amount = float(message.text)
+
+        if operation == UserManagementOperation.ADD_BALANCE:
+            user.top_up_amount += amount
             await UserRepository.update(user, session)
             await session_commit(session)
-            return Localizator.get_text(BotEntity.ADMIN, "credit_management_added_success").format(
+
+            admin_msg = Localizator.get_text(
+                BotEntity.ADMIN, "credit_management_added_success"
+            ).format(
                 amount=message.text,
                 telegram_id=user.telegram_id,
-                currency_text=Localizator.get_currency_text())
+                currency_text=Localizator.get_currency_text()
+            )
+
+            user_msg = f"💰 Balansingizga {amount:,.0f} so‘m qo‘shildi!"
+
         else:
-            user.consume_records += float(message.text)
+            user.consume_records += amount
             await UserRepository.update(user, session)
             await session_commit(session)
-            return Localizator.get_text(BotEntity.ADMIN, "credit_management_reduced_success").format(
+
+            admin_msg = Localizator.get_text(
+                BotEntity.ADMIN, "credit_management_reduced_success"
+            ).format(
                 amount=message.text,
                 telegram_id=user.telegram_id,
-                currency_text=Localizator.get_currency_text())
+                currency_text=Localizator.get_currency_text()
+            )
+
+            user_msg = f"💳 Balansingizdan {amount:,.0f} so‘m yechildi."
+
+        return admin_msg, user_msg, user.telegram_id
+
 
     @staticmethod
     async def get_refund_menu(callback: CallbackQuery, session: AsyncSession | Session) -> tuple[

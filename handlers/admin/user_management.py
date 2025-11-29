@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
+from services.notification import NotificationService
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
@@ -35,17 +36,25 @@ async def credit_management(**kwargs):
         await callback.message.edit_text(text=msg, reply_markup=kb_builder.as_markup())
 
 
-@user_management.message(AdminIdFilter(), F.text, StateFilter(UserManagementStates.user_entity,
-                                                              UserManagementStates.balance_amount))
+@user_management.message(
+    AdminIdFilter(), F.text, StateFilter(UserManagementStates.user_entity, UserManagementStates.balance_amount)
+)
 async def balance_management(message: Message, state: FSMContext, session: AsyncSession | Session):
     current_state = await state.get_state()
+
     match current_state:
         case UserManagementStates.user_entity:
             msg, kb_builder = await AdminService.request_balance_amount(message, state)
             await message.answer(text=msg, reply_markup=kb_builder.as_markup())
+
         case UserManagementStates.balance_amount:
-            msg = await AdminService.balance_management(message, state, session)
-            await message.answer(text=msg)
+            admin_msg, user_msg, telegram_id = await AdminService.balance_management(message, state, session)
+
+            await message.answer(text=admin_msg)
+
+            if user_msg and telegram_id:
+                await NotificationService.send_to_user(user_msg, telegram_id)
+
 
 
 async def refund_buy(**kwargs):
