@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from callbacks import AllCategoriesCallback
+from callbacks import AllCategoriesCallback, BaseCallback
 from enums.bot_entity import BotEntity
 from services.cart import CartService
 from services.category import CategoryService
@@ -40,10 +40,26 @@ async def show_subcategories_in_category(**kwargs):
 
 
 async def select_quantity(**kwargs):
-    callback = kwargs.get("callback")
+    callback: types.CallbackQuery = kwargs.get("callback")
     session = kwargs.get("session")
-    msg, kb_builder = await SubcategoryService.get_select_quantity_buttons(callback, session)
-    await callback.message.edit_text(msg, reply_markup=kb_builder.as_markup())
+
+    msg, kb_builder, photo_url = await SubcategoryService.get_select_quantity_buttons(callback, session)
+
+    # delete previous message to avoid edit issues
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+
+    # send new message with random image + keyboard
+    await callback.message.answer_photo(
+        photo=photo_url,
+        caption=msg,
+        reply_markup=kb_builder.as_markup()
+    )
+
+    # confirm callback
+    await callback.answer()
 
 
 async def add_to_cart_confirmation(**kwargs):
@@ -81,3 +97,43 @@ async def navigate_categories(callback: CallbackQuery, callback_data: AllCategor
     }
 
     await current_level_function(**kwargs)
+
+@all_categories_router.callback_query(BaseCallback.filter())
+async def base_back_handler(callback: types.CallbackQuery, callback_data: BaseCallback, session: AsyncSession):
+    lvl = callback_data.level
+
+    # LEVEL 0 → show categories (main menu)
+    if lvl == 0:
+        msg, kb = await CategoryService.get_buttons(callback, session)
+
+    # LEVEL 1 → show subcategories
+    elif lvl == 1:
+        msg, kb = await SubcategoryService.get_buttons(callback, session)
+
+    # LEVEL 2 → show quantity selection
+    elif lvl == 2:
+        msg, kb = await SubcategoryService.get_select_quantity_buttons(callback, session)
+
+    else:
+        # Unknown level → do nothing
+        await callback.answer()
+        return
+
+    # pick a random image (replace RANDOM_IMAGES with your list)
+    photo_url = random.choice(RANDOM_IMAGES)
+
+    # delete old message to avoid "no text in message to edit"
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+
+    # send new message with photo + caption + keyboard
+    await callback.message.answer_photo(
+        photo=photo_url,
+        caption=msg,
+        reply_markup=kb.as_markup()
+    )
+
+    # confirm callback to remove spinning loader
+    await callback.answer()

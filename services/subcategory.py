@@ -12,6 +12,13 @@ from repositories.item import ItemRepository
 from repositories.subcategory import SubcategoryRepository
 from utils.localizator import Localizator
 
+import random
+
+RANDOM_IMAGES = [
+    "https://picsum.photos/600/400",
+    "https://loremflickr.com/600/400/product",
+]
+
 
 class SubcategoryService:
 
@@ -43,12 +50,21 @@ class SubcategoryService:
         return Localizator.get_text(BotEntity.USER, "subcategories"), kb_builder
 
     @staticmethod
-    async def get_select_quantity_buttons(callback: CallbackQuery, session: AsyncSession | Session) -> tuple[str, InlineKeyboardBuilder]:
+    async def get_select_quantity_buttons(callback: CallbackQuery, session: AsyncSession | Session) -> tuple[str, InlineKeyboardBuilder, str]:
+        """
+        Returns message text, keyboard, and a random image URL for quantity selection.
+        """
         unpacked_cb = AllCategoriesCallback.unpack(callback.data)
+
+        # fetch item / category / subcategory
         item = await ItemRepository.get_single(unpacked_cb.category_id, unpacked_cb.subcategory_id, session)
         subcategory = await SubcategoryRepository.get_by_id(unpacked_cb.subcategory_id, session)
         category = await CategoryRepository.get_by_id(unpacked_cb.category_id, session)
+
+        # available quantity
         available_qty = await ItemRepository.get_available_qty(item, session)
+
+        # message text
         message_text = Localizator.get_text(BotEntity.USER, "select_quantity").format(
             category_name=category.name,
             subcategory_name=subcategory.name,
@@ -57,17 +73,28 @@ class SubcategoryService:
             quantity=available_qty,
             currency_sym=Localizator.get_currency_symbol()
         )
+
+        # keyboard
         kb_builder = InlineKeyboardBuilder()
-        for i in range(1, 11):
-            kb_builder.button(text=str(i), callback_data=AllCategoriesCallback.create(
-                unpacked_cb.level + 1,
-                item.category_id,
-                item.subcategory_id,
-                quantity=i
-            ))
+        for i in range(1, min(available_qty, 10) + 1):  # show max 10
+            kb_builder.button(
+                text=str(i),
+                callback_data=AllCategoriesCallback.create(
+                    unpacked_cb.level + 1,
+                    item.category_id,
+                    item.subcategory_id,
+                    quantity=i
+                )
+            )
         kb_builder.adjust(3)
+
+        # add back button
         kb_builder.row(unpacked_cb.get_back_button())
-        return message_text, kb_builder
+
+        # random image
+        photo_url = random.choice(RANDOM_IMAGES)
+
+        return message_text, kb_builder, photo_url
 
     @staticmethod
     async def get_add_to_cart_buttons(callback: CallbackQuery, session: AsyncSession | Session) -> tuple[str, InlineKeyboardBuilder]:

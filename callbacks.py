@@ -10,16 +10,17 @@ from utils.localizator import Localizator
 
 class BaseCallback(CallbackData, prefix="base"):
     level: int
+    category_id: int | None = None
+    subcategory_id: int | None = None
 
     def get_back_button(self, lvl: int | None = None):
-        cb_copy = self.__copy__()
-        if lvl is None:
-            cb_copy.level = cb_copy.level - 1
-        else:
-            cb_copy.level = lvl
+        cb = self.__copy__()
+        cb.level = (cb.level - 1) if lvl is None else lvl
         return types.InlineKeyboardButton(
             text=Localizator.get_text(BotEntity.COMMON, "back_button"),
-            callback_data=cb_copy.create(**cb_copy.model_dump()).pack())
+            callback_data=cb.pack()
+        )
+
 
 
 class AllCategoriesCallback(BaseCallback, prefix="all_categories"):
