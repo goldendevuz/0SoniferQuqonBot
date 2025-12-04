@@ -49,8 +49,15 @@ async def start(message: types.message, session: AsyncSession | Session):
     await message.answer(Localizator.get_text(BotEntity.COMMON, "start_message"), reply_markup=start_markup)
 
 
-@main_router.message(F.text == Localizator.get_text(BotEntity.USER, "faq"), IsUserExistFilter())
-async def faq(message: types.message):
+@main_router.message(
+    Command("faq"),
+    IsUserExistFilter()
+)
+@main_router.message(
+    F.text == Localizator.get_text(BotEntity.USER, "faq"),
+    IsUserExistFilter()
+)
+async def faq_handler(message: types.Message):
     await message.answer(Localizator.get_text(BotEntity.USER, "faq_string"))
 
 
