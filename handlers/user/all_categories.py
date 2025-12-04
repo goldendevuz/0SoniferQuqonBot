@@ -14,9 +14,11 @@ from utils.localizator import Localizator
 all_categories_router = Router()
 
 
+from aiogram import F
+
 @all_categories_router.message(
     (F.text == Localizator.get_text(BotEntity.USER, "all_categories")) | 
-    (F.text == "/categories"), 
+    F.command("categories"), 
     IsUserExistFilter()
 )
 async def all_categories_text_message(message: types.Message, session: AsyncSession | Session):
