@@ -1,5 +1,6 @@
 from aiogram import types, Router, F
 from aiogram.types import CallbackQuery, Message
+from aiogram.filters import Command
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
@@ -15,8 +16,15 @@ from utils.localizator import Localizator
 my_profile_router = Router()
 
 
-@my_profile_router.message(F.text == Localizator.get_text(BotEntity.USER, "my_profile"), IsUserExistFilter())
-async def my_profile_text_message(message: types.message, session: Session | AsyncSession):
+@my_profile_router.message(
+    Command("my_profile"),
+    IsUserExistFilter()
+)
+@my_profile_router.message(
+    F.text == Localizator.get_text(BotEntity.USER, "my_profile"),
+    IsUserExistFilter()
+)
+async def my_profile_text_message(message: types.Message, session: Session | AsyncSession):
     await my_profile(message=message, session=session)
 
 
