@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.INFO)
 main_router = Router()
 
 
-@main_router.message(Command(commands=["start", "help"]))
+@main_router.message(Command(commands=["start"]))
 async def start(message: types.message, session: AsyncSession | Session):
     all_categories_button = types.KeyboardButton(text=Localizator.get_text(BotEntity.USER, "all_categories"))
     my_profile_button = types.KeyboardButton(text=Localizator.get_text(BotEntity.USER, "my_profile"))
@@ -61,13 +61,24 @@ async def faq_handler(message: types.Message):
     await message.answer(Localizator.get_text(BotEntity.USER, "faq_string"))
 
 
-@main_router.message(F.text == Localizator.get_text(BotEntity.USER, "help"), IsUserExistFilter())
-async def support(message: types.message):
+@main_router.message(
+    Command("help"),
+    IsUserExistFilter()
+)
+@main_router.message(
+    F.text == Localizator.get_text(BotEntity.USER, "help"),
+    IsUserExistFilter()
+)
+async def support_handler(message: types.Message):
     admin_keyboard_builder = InlineKeyboardBuilder()
-
-    admin_keyboard_builder.button(text=Localizator.get_text(BotEntity.USER, "help_button"), url=SUPPORT_LINK)
-    await message.answer(Localizator.get_text(BotEntity.USER, "help_string"),
-                         reply_markup=admin_keyboard_builder.as_markup())
+    admin_keyboard_builder.button(
+        text=Localizator.get_text(BotEntity.USER, "help_button"),
+        url=SUPPORT_LINK
+    )
+    await message.answer(
+        Localizator.get_text(BotEntity.USER, "help_string"),
+        reply_markup=admin_keyboard_builder.as_markup()
+    )
 
 
 @main_router.error(F.update.message.as_("message"))
