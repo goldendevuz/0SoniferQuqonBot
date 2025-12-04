@@ -1,5 +1,6 @@
 from aiogram import types, Router, F
 from aiogram.types import Message, CallbackQuery
+from aiogram.filters import Command
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
@@ -13,11 +14,8 @@ from utils.localizator import Localizator
 
 all_categories_router = Router()
 
-
-from aiogram import F
-
 @all_categories_router.message(
-    F.command("categories"),
+    Command("categories"),
     IsUserExistFilter()
 )
 @all_categories_router.message(
