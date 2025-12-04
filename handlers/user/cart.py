@@ -1,7 +1,6 @@
-import inspect
-
 from aiogram import types, F, Router
 from aiogram.types import CallbackQuery, Message
+from aiogram.filters import Command
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
@@ -14,8 +13,15 @@ from utils.localizator import Localizator
 cart_router = Router()
 
 
-@cart_router.message(F.text == Localizator.get_text(BotEntity.USER, "cart"), IsUserExistFilter())
-async def cart_text_message(message: types.message, session: AsyncSession | Session):
+@cart_router.message(
+    Command("cart"),
+    IsUserExistFilter()
+)
+@cart_router.message(
+    F.text == Localizator.get_text(BotEntity.USER, "cart"),
+    IsUserExistFilter()
+)
+async def cart_handler(message: types.Message, session: AsyncSession | Session):
     await show_cart(message=message, session=session)
 
 
