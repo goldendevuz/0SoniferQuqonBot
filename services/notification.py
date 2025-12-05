@@ -127,8 +127,11 @@ class NotificationService:
                                                            category_id=item.category_id), session)
             category = await CategoryRepository.get_by_id(item.category_id, session)
             subcategory = await SubcategoryRepository.get_by_id(item.subcategory_id, session)
-            cart_item_total = price * item.quantity
+            # cart_item_total ni alohida formatlash
+            cart_item_total = "{:,}".format(price * item.quantity)  # 3-raqamdan ajratadi
             cart_grand_total += cart_item_total
+            cart_grand_total = "{:,}".format(cart_grand_total)
+            
             if user.telegram_username:
                 message += Localizator.get_text(BotEntity.ADMIN, "notification_purchase_with_tgid").format(
                     username=user.telegram_username,

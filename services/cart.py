@@ -57,10 +57,13 @@ class CartService:
                 continue  # skip this item
   
             subcategory = await SubcategoryRepository.get_by_id(cart_item.subcategory_id, session)
+            # total_price ni alohida formatlash
+            formatted_total_price = "{:,}".format(cart_item.quantity * price)  # 3-raqamdan ajratadi
+
             kb_builder.button(text=Localizator.get_text(BotEntity.USER, "cart_item_button").format(
                 subcategory_name=subcategory.name,
                 qty=cart_item.quantity,
-                total_price=cart_item.quantity * price,
+                total_price=formatted_total_price,
                 currency_sym=Localizator.get_currency_symbol()),
                 callback_data=CartCallback.create(1, page, cart_item_id=cart_item.id))
         if len(kb_builder.as_markup().inline_keyboard) > 0:
@@ -107,12 +110,14 @@ class CartService:
                 logging.warning(f"Cart item {cart_item.id} has missing product/price")
                 continue  # skip this item
 
-            line_item_total = price * cart_item.quantity
+            # line_item_total ni alohida formatlash
+            line_item_total = "{:,}".format(price * cart_item.quantity)  # 3-raqamdan ajratadi
             cart_line_item = Localizator.get_text(BotEntity.USER, "cart_item_button").format(
                 subcategory_name=subcategory.name, qty=cart_item.quantity,
                 total_price=line_item_total, currency_sym=Localizator.get_currency_symbol()
             )
-            cart_grand_total += line_item_total
+            cart_grand_total += float(line_item_total.replace(",", ""))
+            cart_grand_total = "{:,}".format(cart_grand_total)
             message_text += cart_line_item
         message_text += Localizator.get_text(BotEntity.USER, "cart_grand_total_string").format(
             cart_grand_total=cart_grand_total, currency_sym=Localizator.get_currency_symbol())
@@ -160,7 +165,9 @@ class CartService:
                                                                subcategory_id=cart_item.subcategory_id), session)
                 purchased_items = await ItemRepository.get_purchased_items(cart_item.category_id,
                                                                            cart_item.subcategory_id, cart_item.quantity, session)
-                buy_dto = BuyDTO(buyer_id=user.id, quantity=cart_item.quantity, total_price=cart_item.quantity * price)
+                # total_price ni alohida formatlash
+                formatted_total_price = "{:,}".format(price * cart_item.quantity)  # 3-raqamdan ajratadi
+                buy_dto = BuyDTO(buyer_id=user.id, quantity=cart_item.quantity, total_price=formatted_total_price)
                 buy_id = await BuyRepository.create(buy_dto, session)
                 buy_item_dto_list = [BuyItemDTO(item_id=item.id, buy_id=buy_id) for item in purchased_items]
                 await BuyItemRepository.create_many(buy_item_dto_list, session)
