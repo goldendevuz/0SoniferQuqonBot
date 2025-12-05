@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 import config
 from config import SUPPORT_LINK
 import logging
-from bot import dp, main, redis
+from bot import dp, main, redis, bot
 from enums.bot_entity import BotEntity
 from middleware.database import DBSessionMiddleware
 from middleware.throttling_middleware import ThrottlingMiddleware
@@ -23,6 +23,7 @@ from services.notification import NotificationService
 from services.user import UserService
 from utils.custom_filters import IsUserExistFilter
 from utils.localizator import Localizator
+from utils.set_bot_commands import set_default_commands
 
 logging.basicConfig(level=logging.INFO)
 main_router = Router()
@@ -30,6 +31,8 @@ main_router = Router()
 
 @main_router.message(Command(commands=["start"]))
 async def start(message: types.message, session: AsyncSession | Session):
+    await set_default_commands(bot)
+
     all_categories_button = types.KeyboardButton(text=Localizator.get_text(BotEntity.USER, "all_categories"))
     my_profile_button = types.KeyboardButton(text=Localizator.get_text(BotEntity.USER, "my_profile"))
     faq_button = types.KeyboardButton(text=Localizator.get_text(BotEntity.USER, "faq"))
@@ -37,6 +40,7 @@ async def start(message: types.message, session: AsyncSession | Session):
     admin_menu_button = types.KeyboardButton(text=Localizator.get_text(BotEntity.ADMIN, "menu"))
     cart_button = types.KeyboardButton(text=Localizator.get_text(BotEntity.USER, "cart"))
     telegram_id = message.from_user.id
+
     await UserService.create_if_not_exist(UserDTO(
         telegram_username=message.from_user.username,
         telegram_id=telegram_id
