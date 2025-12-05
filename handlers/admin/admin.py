@@ -1,8 +1,9 @@
-import inspect
 from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.filters import Command
+
 from callbacks import AdminMenuCallback, AdminAnnouncementCallback, AdminInventoryManagementCallback, \
     UserManagementCallback, StatisticsCallback, WalletCallback
 from enums.bot_entity import BotEntity
@@ -22,8 +23,15 @@ admin_router.include_router(statistics)
 admin_router.include_router(wallet)
 
 
-@admin_router.message(F.text == Localizator.get_text(BotEntity.ADMIN, "menu"), AdminIdFilter())
-async def admin_command_handler(message: types.message):
+@admin_router.message(
+    Command("panel"),
+    AdminIdFilter()
+)
+@admin_router.message(
+    F.text == Localizator.get_text(BotEntity.ADMIN, "menu"),
+    AdminIdFilter()
+)
+async def admin_command_handler(message: types.Message):
     await admin(message=message)
 
 
