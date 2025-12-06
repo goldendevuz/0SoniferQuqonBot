@@ -1,3 +1,4 @@
+import logging
 from aiogram import types, Router, F
 from aiogram.types import CallbackQuery, Message
 from aiogram.filters import Command
@@ -66,10 +67,13 @@ async def get_order_from_history(**kwargs):
 
 
 async def create_payment(**kwargs):
+    logging.info("create_payment")
     callback: CallbackQuery = kwargs.get("callback")
     session: AsyncSession | Session = kwargs.get("session")
     unpacked_cb = MyProfileCallback.unpack(callback.data)
     msg = await callback.message.edit_text(Localizator.get_text(BotEntity.USER, "loading"))
+    logging.info(f"callback={callback}, session={session}, unpacked_cb={unpacked_cb}, msg={msg}")
+
     text = await PaymentService.create(Cryptocurrency(unpacked_cb.args_for_action), msg, session)
     await msg.edit_text(text=text)
 

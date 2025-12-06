@@ -157,6 +157,7 @@ class CartService:
                 out_of_stock.append(cart_item)
         is_enough_money = (user.top_up_amount - user.consume_records) >= cart_total
         kb_builder = InlineKeyboardBuilder()
+        logging.info(out_of_stock)
         if unpacked_cb.confirmation and len(out_of_stock) == 0 and is_enough_money:
             sold_items = []
             msg = ""
@@ -188,7 +189,7 @@ class CartService:
         elif is_enough_money is False:
             kb_builder.row(unpacked_cb.get_back_button(0))
             return Localizator.get_text(BotEntity.USER, "insufficient_funds"), kb_builder
-        elif len(out_of_stock) > 0:
+        elif len(out_of_stock) <= 0:
             kb_builder.row(unpacked_cb.get_back_button(0))
             msg = Localizator.get_text(BotEntity.USER, "out_of_stock")
             for item in out_of_stock:

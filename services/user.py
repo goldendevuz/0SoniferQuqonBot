@@ -61,6 +61,16 @@ class UserService:
         unpacked_cb = MyProfileCallback.unpack(callback.data)
         kb_builder = InlineKeyboardBuilder()
 
+        kb_builder.button(text=Localizator.get_text(BotEntity.COMMON, "uzs_top_up"),
+                          callback_data=MyProfileCallback.create(unpacked_cb.level + 1,
+                                                                 args_for_action=Cryptocurrency.UZS.value))
+        kb_builder.button(text=Localizator.get_text(BotEntity.COMMON, "ton_top_up"),
+                          callback_data=MyProfileCallback.create(unpacked_cb.level + 1,
+                                                                 args_for_action=Cryptocurrency.TON.value))
+        kb_builder.button(text=Localizator.get_text(BotEntity.COMMON, "usdt_top_up"),
+                          callback_data=MyProfileCallback.create(unpacked_cb.level + 1,
+                                                                 args_for_action=Cryptocurrency.USDT.value))
+
         kb_builder.adjust(1)
         kb_builder.row(unpacked_cb.get_back_button())
         msg_text = Localizator.get_text(BotEntity.USER, "choose_top_up_method")
